@@ -4,6 +4,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:convert';
 import 'dart:io';
 import '../models/unauthorized_person.dart';
+import '../services/http_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import 'sensor_provider.dart';
@@ -24,6 +25,9 @@ class MqttProvider extends ChangeNotifier {
   // Topic definitions (simplified)
   static const String TOPIC_DATA = 'room/monitor/data';
   static const String TOPIC_DOOR = 'room/door/open';
+  static const String TOPIC_UNAUTH = 'room/gate/unauth';
+  static const String TOPIC_LIGHT = 'room/light';
+
 
   MqttProvider({
     required this.sensorProvider,
@@ -100,6 +104,7 @@ class MqttProvider extends ChangeNotifier {
   void subscribeToTopics() {
     print('Subscribing to topics...');
     client!.subscribe(TOPIC_DATA, MqttQos.atLeastOnce);
+    client!.subscribe(TOPIC_UNAUTH, MqttQos.atLeastOnce);
   }
 
   void handleMessage(String topic, String payload) {
@@ -110,9 +115,48 @@ class MqttProvider extends ChangeNotifier {
       if (topic == TOPIC_DATA) {
         sensorProvider.updateMonitorData(data);
       }
+      else if (topic == TOPIC_UNAUTH && data['unauth'] == true) {
+        // Handle unauthorized person detection
+        _handleUnauthorizedPerson();
+      }
     } catch (e) {
       print('Error handling message: $e');
     }
+  }
+
+  Future<void> _handleUnauthorizedPerson() async {
+    try {
+      // Fetch the image from your backend
+      final imageData = await HttpService().fetchUnauthorizedPersonImage();
+
+      if (imageData != null) {
+        // Create unauthorized person with fetched image
+        final person = UnauthorizedPerson(
+          id: DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
+          imageUrl: imageData, // This will now be base64 or binary data
+          timestamp: DateTime.now(),
+        );
+
+        securityProvider.addUnauthorizedPerson(person);
+
+        // Show notification
+        NotificationService().showNotification(
+          '⚠️ Unauthorized Person Detected',
+          'Someone is trying to access the room. Please check the dashboard.',
+        );
+      }
+    } catch (e) {
+      print('Error handling unauthorized person: $e');
+    }
+  }
+
+  // Add method to control light
+  void controlLight(bool turnOn) {
+    publishCommand(TOPIC_LIGHT, {"light": turnOn});
+    print('Light ${turnOn ? "ON" : "OFF"} command sent');
   }
 
   void publishCommand(String topic, Map<String, dynamic> data) {

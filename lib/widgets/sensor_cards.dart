@@ -8,6 +8,10 @@ class SensorCards extends StatelessWidget {
     return Consumer<SensorProvider>(
       builder: (context, provider, _) {
         final data = provider.currentData;
+        bool smoke = false;
+        if(data?.smokeDetected != null && data!.smokeDetected > 115){
+          smoke = true;
+        }
 
         return Container(
           height: 200,
@@ -36,11 +40,11 @@ class SensorCards extends StatelessWidget {
                 child: _buildSensorCard(
                   icon: Icons.warning_amber,
                   title: 'Smoke',
-                  value: data?.smokeDetected ?? false ? 'DETECTED' : 'Clear',
-                  color: data?.smokeDetected ?? false
+                  value: smoke == true ? 'DETECTED' : 'Clear',
+                  color: smoke == true
                       ? Colors.red
                       : Colors.green,
-                  isAlert: data?.smokeDetected ?? false,
+                  isAlert: smoke == true,
                 ),
               ),
               SizedBox(width: 16),
@@ -113,6 +117,10 @@ class MobileSensorCards extends StatelessWidget {
     return Consumer<SensorProvider>(
       builder: (context, provider, _) {
         final data = provider.currentData;
+        bool smoke = false;
+        if(data?.smokeDetected != null && data!.smokeDetected > 115){
+          smoke = true;
+        }
 
         return Column(
           children: [
@@ -147,11 +155,11 @@ class MobileSensorCards extends StatelessWidget {
                   child: _buildMobileSensorCard(
                     icon: Icons.warning_amber,
                     title: 'Smoke',
-                    value: data?.smokeDetected ?? false ? 'DETECTED' : 'Clear',
-                    color: data?.smokeDetected ?? false
+                    value: smoke == true ? 'DETECTED' : 'Clear',
+                    color: smoke == true
                         ? Colors.red
                         : Colors.green,
-                    isAlert: data?.smokeDetected ?? false,
+                    isAlert: smoke == true,
                   ),
                 ),
                 SizedBox(width: 12),

@@ -2,12 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/notification_service.dart';
+import '../widgets/control_panel.dart';
 import '../widgets/sensor_cards.dart';
 import '../widgets/camera_view.dart';
 import '../widgets/security_panel.dart';
 import '../widgets/charts_widget.dart';
 import '../providers/mqtt_provider.dart';
 import '../widgets/notification_center.dart';
+
 
 class MobileDashboardScreen extends StatefulWidget {
   @override
@@ -64,8 +66,10 @@ class _MobileDashboardScreenState extends State<MobileDashboardScreen> {
           _buildCameraView(),
           _buildSecurityView(),
           _buildChartsView(),
+          _buildControlsView(),  // Add this
         ],
       ),
+      // Update the bottom navigation to add Controls
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
@@ -89,6 +93,10 @@ class _MobileDashboardScreenState extends State<MobileDashboardScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.analytics),
             label: 'Charts',
+          ),
+          BottomNavigationBarItem(  // Add this
+            icon: Icon(Icons.settings_remote),
+            label: 'Controls',
           ),
         ],
       ),
@@ -171,6 +179,13 @@ class _MobileDashboardScreenState extends State<MobileDashboardScreen> {
         height: MediaQuery.of(context).size.height * 0.8,
         child: ChartsWidget(),
       ),
+    );
+  }
+
+  Widget _buildControlsView() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: ControlPanel(),
     );
   }
 }

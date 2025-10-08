@@ -6,9 +6,8 @@ class SensorProvider extends ChangeNotifier {
   // Separate data storage for each sensor type
   double? _temperature;
   double? _humidity;
-  bool _smokeDetected = false;
+  int _smokeDetected = 0;
   int _motionDetected = 0;
-  int _peopleCount = 0;
   DateTime? _lastUpdate;
 
   // History for data
@@ -23,16 +22,14 @@ class SensorProvider extends ChangeNotifier {
       humidity: _humidity!,
       smokeDetected: _smokeDetected,
       motionDetected: _motionDetected,
-      peopleCount: _peopleCount,
       timestamp: _lastUpdate ?? DateTime.now(),
     );
   }
 
   double? get temperature => _temperature;
   double? get humidity => _humidity;
-  bool get smokeDetected => _smokeDetected;
+  int get smokeDetected => _smokeDetected;
   int get motionDetected => _motionDetected;
-  int get peopleCount => _peopleCount;
 
   List<Map<String, dynamic>> get dataHistory => _dataHistory;
 
@@ -44,7 +41,6 @@ class SensorProvider extends ChangeNotifier {
       _humidity = (data['humidity'] ?? _humidity ?? 0).toDouble();
       _smokeDetected = data['smoke'] ?? _smokeDetected;
       _motionDetected = data['motion'] ?? _motionDetected;
-      _peopleCount = data['people_count'] ?? _peopleCount;
       _lastUpdate = DateTime.now();
 
       // Add to history
@@ -53,7 +49,6 @@ class SensorProvider extends ChangeNotifier {
         'humidity': _humidity,
         'smoke': _smokeDetected,
         'motion': _motionDetected,
-        'people_count': _peopleCount,
         'timestamp': _lastUpdate!.toIso8601String(),
       });
 
@@ -93,7 +88,7 @@ class SensorProvider extends ChangeNotifier {
         '💧 High Humidity Alert',
         'Room humidity is ${_humidity}%',
       );
-    } else if (_humidity! < 30) {
+    } else if (_humidity! < 20) {
       NotificationService().showNotification(
         '🏜️ Low Humidity Alert',
         'Room humidity is ${_humidity}%',
@@ -101,7 +96,7 @@ class SensorProvider extends ChangeNotifier {
     }
 
     // Smoke alert
-    if (_smokeDetected) {
+    if (_smokeDetected > 115) {
       NotificationService().showNotification(
         '🔥 Smoke Detected!',
         'Smoke has been detected in the room. Immediate action required!',

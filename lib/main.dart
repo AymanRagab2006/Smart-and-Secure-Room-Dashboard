@@ -31,21 +31,10 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _securityProvider = SecurityProvider();
 
-    // Start HTTP server and set up callback
-    HttpService().setUnauthorizedPersonCallback((person) {
-      _securityProvider.addUnauthorizedPerson(person);
-      NotificationService().showNotification(
-        '⚠️ Unauthorized Person Detected',
-        'Someone is trying to access the room. Please check the dashboard.',
-      );
-    });
-
-    HttpService().startServer();
   }
 
   @override
   void dispose() {
-    HttpService().stop();
     super.dispose();
   }
 

@@ -11,6 +11,8 @@ import '../widgets/settings_dialog.dart';
 import 'mobile_dashboard_screen.dart';
 import '../widgets/notification_center.dart';
 import '../services/notification_service.dart';
+import '../widgets/control_panel.dart';
+
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -130,6 +132,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       );
     }
+
+// Import the new widget
+
+// Update the _buildDesktopLayout method
   Widget _buildDesktopLayout() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,6 +147,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               SensorCards(),
               SizedBox(height: 20),
+              SizedBox(
+                height: 80,  // Compact controls
+                child: ControlPanel(horizontal: true),
+              ),
+              SizedBox(height: 20),
               Expanded(
                 child: ChartsWidget(),
               ),
@@ -148,18 +159,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         SizedBox(width: 20),
-        // Right Column
+        // Right Column - Camera gets full height
         Expanded(
           flex: 2,
           child: Column(
             children: [
               Expanded(
-                flex: 2,
+                flex: 1,  // Camera takes 50%
                 child: CameraView(),
               ),
               SizedBox(height: 20),
-              SizedBox(
-                height: 350,
+              Expanded(
+                flex: 1,  // Security takes 50%
                 child: SecurityPanel(),
               ),
             ],
@@ -168,7 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
-
+// Update the _buildTabletLayout method
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
       child: Column(
@@ -184,7 +195,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 SizedBox(width: 20),
                 Expanded(
-                  child: SecurityPanel(),
+                  child: Column(
+                    children: [
+                      Expanded(child: SecurityPanel()),
+                      SizedBox(height: 20),
+                      ControlPanel(),  // Add this
+                    ],
+                  ),
                 ),
               ],
             ),
